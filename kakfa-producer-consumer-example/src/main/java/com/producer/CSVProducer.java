@@ -39,7 +39,7 @@ public class CSVProducer implements Runnable {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		// System.out.println("Producer Start");
-		String filepath = "SampleCSVFile_556kb.csv";
+		String filepath = "assets/SampleCSVFile_556kb.csv";
 
 		BlockingQueue<String> msgQueue = new LinkedBlockingQueue<String>(1000);
 
