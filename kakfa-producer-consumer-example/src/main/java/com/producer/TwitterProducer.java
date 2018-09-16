@@ -16,6 +16,10 @@ import org.slf4j.LoggerFactory;
 import com.gaurav.kafka.constants.IKafkaConstants;
 import com.gaurav.kafka.producer.ProducerCreator;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.twitter.hbc.ClientBuilder;
 import com.twitter.hbc.core.Client;
 import com.twitter.hbc.core.Constants;
@@ -41,8 +45,8 @@ public class TwitterProducer implements Runnable {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		//System.out.println("Producer Start");
-		//String filepath = "C:\\test\\SampleCSVFile_556kb.csv";
+		// System.out.println("Producer Start");
+		// String filepath = "C:\\test\\SampleCSVFile_556kb.csv";
 
 		BlockingQueue<String> msgQueue = new LinkedBlockingQueue<String>(1000);
 
@@ -54,7 +58,6 @@ public class TwitterProducer implements Runnable {
 	public void run() {
 		runTwitter();
 	}
-
 
 	public void runTwitter() {
 		logger.info("SetUp");
@@ -70,15 +73,19 @@ public class TwitterProducer implements Runnable {
 			try {
 				msg = msgQueue.poll(5, TimeUnit.SECONDS);
 
+				logger.info("5sec");
+
+				if (msg != null) {
+					Gson gson = new GsonBuilder().setPrettyPrinting().create();
+					JsonParser jp = new JsonParser();
+					JsonElement je = jp.parse(msg);
+					String prettyJsonString = gson.toJson(je);
+					logger.info(prettyJsonString);
+				}
 			} catch (Exception e) {
 				// TODO: handle exception
 				e.printStackTrace();
 				client.stop();
-			}
-			logger.info("5sec");
-
-			if (msg != null) {
-				logger.info(msg);
 			}
 		}
 
@@ -97,7 +104,7 @@ public class TwitterProducer implements Runnable {
 		Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
 		StatusesFilterEndpoint hosebirdEndpoint = new StatusesFilterEndpoint();
 		// Optional: set up some followings and track terms
-		List<String> terms = Lists.newArrayList("TD bank");
+		List<String> terms = Lists.newArrayList("Customer 360");
 		hosebirdEndpoint.trackTerms(terms);
 
 		// These secrets should be read from a config file
