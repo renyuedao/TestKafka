@@ -26,7 +26,7 @@ import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
 
-public class TestProducer implements Runnable {
+public class TwitterProducer implements Runnable {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 	String ck = "Aty8RQgKrgaFwVRNobd6F1xd8";
@@ -35,61 +35,26 @@ public class TestProducer implements Runnable {
 	String tsk = "syEbT8BZYnCuMJei9PPt8ZRQcPXPDR8RFqpc2xnQOjAns";
 	BlockingQueue<String> msgQueue = null;
 
-	public TestProducer(BlockingQueue<String> msgQueue) {
+	public TwitterProducer(BlockingQueue<String> msgQueue) {
 		this.msgQueue = msgQueue;
 	}
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		//System.out.println("Producer Start");
-		String filepath = "C:\\test\\SampleCSVFile_556kb.csv";
+		//String filepath = "C:\\test\\SampleCSVFile_556kb.csv";
 
 		BlockingQueue<String> msgQueue = new LinkedBlockingQueue<String>(1000);
 
-		CSVReader reader = new CSVReader(msgQueue, filepath);
-		new Thread(reader).start();
-
-		TestProducer producer = new TestProducer(msgQueue);
+		TwitterProducer producer = new TwitterProducer(msgQueue);
 		new Thread(producer).start();
 
 	}
 
 	public void run() {
-		runFile();
+		runTwitter();
 	}
 
-	public void runFile() {
-		logger.info("SetUp");
-		Producer<Long, String> producer = ProducerCreator.createProducer();
-
-		try {
-			while (true) {
-				String msg = msgQueue.take();
-				logger.info(msg);
-
-				ProducerRecord<Long, String> record = new ProducerRecord<Long, String>(IKafkaConstants.TOPIC_NAME,
-						msg);
-				try {
-					RecordMetadata metadata = producer.send(record).get();
-					
-				} catch (ExecutionException e) {
-					System.out.println("Error in sending record");
-					System.out.println(e);
-				} catch (InterruptedException e) {
-					System.out.println("Error in sending record");
-					System.out.println(e);
-				}
-				
-				if (msg.equals("EOF")) {
-					break;
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		logger.info("End of Application");
-	}
 
 	public void runTwitter() {
 		logger.info("SetUp");
@@ -132,7 +97,7 @@ public class TestProducer implements Runnable {
 		Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
 		StatusesFilterEndpoint hosebirdEndpoint = new StatusesFilterEndpoint();
 		// Optional: set up some followings and track terms
-		List<String> terms = Lists.newArrayList("*");
+		List<String> terms = Lists.newArrayList("TD bank");
 		hosebirdEndpoint.trackTerms(terms);
 
 		// These secrets should be read from a config file
